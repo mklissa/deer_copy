@@ -1,10 +1,7 @@
 """ Simple maze environment
-
 """
 import numpy as np
 import cv2
-import pdb
-import torch
 
 from deer.base_classes import Environment
 
@@ -74,7 +71,6 @@ class MyEnv(Environment):
         
     def act(self, action):
         """Applies the agent action [action] on the environment.
-
         Parameters
         -----------
         action : int
@@ -105,7 +101,7 @@ class MyEnv(Environment):
     def summarizePerformance(self, test_data_set, learning_algo, *args, **kwargs):
         """ Plot of the low-dimensional representation of the environment built by the model
         """
-        
+
         all_possib_inp=[] # Will store all possible inputs (=observation) for the CRAR agent
         labels_maze=[]
         self.create_map()
@@ -138,11 +134,10 @@ class MyEnv(Environment):
         #np.savetxt('tsne_python/mazesH_labels.txt',np.array(labels_maze))
         
         all_possib_inp=np.expand_dims(np.array(all_possib_inp,dtype='float'),axis=1)
-        
-        all_possib_inp = torch.from_numpy(all_possib_inp).float()
+
         all_possib_abs_states=learning_algo.encoder.predict(all_possib_inp)
-        # if(all_possib_abs_states.ndim==4):
-        #     all_possib_abs_states=np.transpose(all_possib_abs_states, (0, 3, 1, 2))    # data_format='channels_last' --> 'channels_first'
+        if(all_possib_abs_states.ndim==4):
+            all_possib_abs_states=np.transpose(all_possib_abs_states, (0, 3, 1, 2))    # data_format='channels_last' --> 'channels_first'
         
         n=1000
         historics=[]
@@ -150,10 +145,9 @@ class MyEnv(Environment):
             historics.append(np.expand_dims(observ,axis=0))
         historics=np.array(historics)
 
-        historics = torch.from_numpy(historics).float()
         abs_states=learning_algo.encoder.predict(historics)
-        # if(abs_states.ndim==4):
-        #     abs_states=np.transpose(abs_states, (0, 3, 1, 2))    # data_format='channels_last' --> 'channels_first'
+        if(abs_states.ndim==4):
+            abs_states=np.transpose(abs_states, (0, 3, 1, 2))    # data_format='channels_last' --> 'channels_first'
 
         actions=test_data_set.actions()[0:n]
         
@@ -163,12 +157,7 @@ class MyEnv(Environment):
                 
         
         m = cm.ScalarMappable(cmap=cm.jet)
-
-
-
-        abs_states = abs_states.detach().numpy()
-        all_possib_abs_states = all_possib_abs_states.detach().numpy()
-
+        
         x = np.array(abs_states)[:,0]
         y = np.array(abs_states)[:,1]
         if(self.intern_dim>2):
@@ -187,15 +176,10 @@ class MyEnv(Environment):
                     
         # Plot the estimated transitions
         for i in range(n-1):
-            # pdb.set_trace()
-            predicted1=learning_algo.transition.predict(torch.cat((torch.from_numpy(abs_states[i:i+1]).float() ,torch.from_numpy(np.array([[1,0,0,0]])).float()),-1)).detach().numpy()
-            predicted2=learning_algo.transition.predict(torch.cat((torch.from_numpy(abs_states[i:i+1]).float() ,torch.from_numpy(np.array([[0,1,0,0]])).float()),-1)).detach().numpy()
-            predicted3=learning_algo.transition.predict(torch.cat((torch.from_numpy(abs_states[i:i+1]).float() ,torch.from_numpy(np.array([[0,0,1,0]])).float()),-1)).detach().numpy()
-            predicted4=learning_algo.transition.predict(torch.cat((torch.from_numpy(abs_states[i:i+1]).float() ,torch.from_numpy(np.array([[0,0,0,1]])).float()),-1)).detach().numpy()            
-            # predicted1=learning_algo.transition.predict([abs_states[i:i+1],np.array([[1,0,0,0]])])
-            # predicted2=learning_algo.transition.predict([abs_states[i:i+1],np.array([[0,1,0,0]])])
-            # predicted3=learning_algo.transition.predict([abs_states[i:i+1],np.array([[0,0,1,0]])])
-            # predicted4=learning_algo.transition.predict([abs_states[i:i+1],np.array([[0,0,0,1]])])
+            predicted1=learning_algo.transition.predict([abs_states[i:i+1],np.array([[1,0,0,0]])])
+            predicted2=learning_algo.transition.predict([abs_states[i:i+1],np.array([[0,1,0,0]])])
+            predicted3=learning_algo.transition.predict([abs_states[i:i+1],np.array([[0,0,1,0]])])
+            predicted4=learning_algo.transition.predict([abs_states[i:i+1],np.array([[0,0,0,1]])])
             if(self.intern_dim==2):
                 ax.plot(np.concatenate([x[i:i+1],predicted1[0,:1]]), np.concatenate([y[i:i+1],predicted1[0,1:2]]), color="0.9", alpha=0.75)
                 ax.plot(np.concatenate([x[i:i+1],predicted2[0,:1]]), np.concatenate([y[i:i+1],predicted2[0,1:2]]), color="0.65", alpha=0.75)
@@ -248,7 +232,7 @@ class MyEnv(Environment):
         
         
         #plt.show()
-        plt.savefig('pytorch/fig_base'+str(learning_algo.update_counter)+'.pdf')
+        plt.savefig('keras/fig_base'+str(learning_algo.update_counter)+'.pdf')
 
 
 #        # Plot the Q_vals

@@ -11,7 +11,7 @@ import pdb
 from deer.default_parser import process_args
 from deer.agent import NeuralAgent
 from deer.learning_algos.CRAR_keras import CRAR
-from simple_maze_env import MyEnv as simple_maze_env
+from simple_maze_env_keras import MyEnv as simple_maze_env
 import deer.experiment.base_controllers as bc
 
 from deer.policies import EpsilonGreedyPolicy

@@ -11,6 +11,7 @@ import copy
 import sys
 import joblib
 from warnings import warn
+import pdb
 
 from .experiment import base_controllers as controllers
 from .helper import tree 
@@ -217,16 +218,16 @@ class NeuralAgent(object):
             pass
         basename = "nnets/" + fname
 
-        for f in os.listdir("nnets/"):
-            if fname in f:
-                os.remove("nnets/" + f)
+        # for f in os.listdir("nnets/"):
+        #     if fname in f:
+        #         os.remove("nnets/" + f)
 
-        all_params = self._learning_algo.getAllParams()
+        # all_params = self._learning_algo.getAllParams()
 
-        if (nEpoch>=0):
-            joblib.dump(all_params, basename + ".epoch={}".format(nEpoch))
-        else:
-            joblib.dump(all_params, basename, compress=True)
+        # if (nEpoch>=0):
+        #     joblib.dump(all_params, basename + ".epoch={}".format(nEpoch))
+        # else:
+        #     joblib.dump(all_params, basename, compress=True)
 
     def setNetwork(self, fname, nEpoch=-1):
         """ Set values into the network
@@ -263,6 +264,7 @@ class NeuralAgent(object):
         epoch_length : int
             maximum number of steps for a given epoch
         """
+
         for c in self._controllers: c.onStart(self)
         i = 0
         while i < n_epochs or self._mode_epochs_length > 0:
